@@ -3,6 +3,9 @@
 実際に運営するサービスではないため、全ソースを公開しています。
 Vue.jsの勉強用のリポジトリなので、エラーハンドリングなどは行っていません。
 
+# 動作
+<iframe width="560" height="315" src="https://www.youtube.com/embed/PLzB0A175uc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 # 設計
 ![設計](/docs/images/DBClient%E3%83%A2%E3%83%87%E3%83%AB.png)
 

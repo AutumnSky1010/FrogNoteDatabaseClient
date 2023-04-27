@@ -14,6 +14,7 @@ import { useBackupsStore } from '../../application/stores/backups';
 import '../assets/colors.css';
 import { useSignInUserStore } from '../../application/stores/authorizations/signInUser';
 
+// HomeViewのViewModel
 class HomeViewModel {
     public backups: Ref<BackupMeta[]>;
     public password = ref('');
@@ -38,6 +39,7 @@ class HomeViewModel {
     }
 }
 
+// HomeVMに関するコマンドの基底クラス。
 abstract class HomeVMCommandBase {
     protected homeVM: HomeViewModel;
     constructor(homeVM: HomeViewModel) {
@@ -45,6 +47,7 @@ abstract class HomeVMCommandBase {
     }
 }
 
+// Dialogを開閉するハンドラをまとめたクラス。
 class DialogCommands extends HomeVMCommandBase {
 
     constructor(homeVM: HomeViewModel) {
@@ -64,6 +67,7 @@ class DialogCommands extends HomeVMCommandBase {
     }
 }
 
+// 文字入力ハンドラをまとめたクラス。
 class TextInputCommands extends HomeVMCommandBase {
     constructor(homeVM: HomeViewModel) {
         super(homeVM);
@@ -91,13 +95,16 @@ const homeVM = new HomeViewModel();
 const dialogCommands = new DialogCommands(homeVM);
 const textInputCommands = new TextInputCommands(homeVM);
 
-
+// 登録ボタンのイベントハンドラ
 function register(): void {
     const user = new User(homeVM.screenName.value, homeVM.signInId.value, homeVM.password.value);
     userUC.create(user);
+    homeVM.password.value = "";
+    homeVM.signInId.value = "";
     dialogCommands.toggleIsSignUpDialogOpened();
 }
 
+// アップロードボタンのイベントハンドラ
 function upload(): void {
     const input = <HTMLInputElement>document.getElementById('upload_input');
     if (input.files === null || input.files.length !== 1) {
@@ -107,6 +114,14 @@ function upload(): void {
     dialogCommands.toggleIsUploadDialogOpened();
 }
 
+// ログインボタンのイベントハンドラ。
+function signIn(): void {
+    userUC.signIn(homeVM.signInId.value, homeVM.password.value);
+    dialogCommands.toggleIsSignInDialogOpened();
+    homeVM.password.value = "";
+    homeVM.signInId.value = "";
+}
+
 </script>
 
 <template>
@@ -114,13 +129,14 @@ function upload(): void {
         <div class="dialog_content">
             <p>ログイン</p>
             <div class="dialog_text_boxes">
-                <TextBox class="text_box" placeholder="ID" @on-input="event => textInputCommands.inputSignInId(event)"></TextBox>
-                <TextBox class="text_box" placeholder="パスワード" type="password" @on-input="event => textInputCommands.inputPassword(event)"></TextBox>
+                <TextBox class="text_box" placeholder="ID" @on-input="event => textInputCommands.inputSignInId(event)">
+                </TextBox>
+                <TextBox class="text_box" placeholder="パスワード" type="password"
+                    @on-input="event => textInputCommands.inputPassword(event)"></TextBox>
             </div>
             <div class="dialog_buttons">
                 <FrogNoteButton text="やめる" @click="dialogCommands.toggleIsSignInDialogOpened()"></FrogNoteButton>
-                <FrogNoteButton text="ログイン"
-                    @click="() => { userUC.signIn(homeVM.signInId.value, homeVM.password.value); dialogCommands.toggleIsSignInDialogOpened(); }">
+                <FrogNoteButton text="ログイン" @click="() => signIn()">
                 </FrogNoteButton>
             </div>
         </div>
@@ -129,9 +145,12 @@ function upload(): void {
         <div class="dialog_content">
             <p>アカウント作成</p>
             <div class="dialog_text_boxes">
-                <TextBox class="text_box" placeholder="表示される名前" @on-input="event => textInputCommands.inputScreenName(event)"></TextBox>
-                <TextBox class="text_box" placeholder="ID" @on-input="event => textInputCommands.inputSignInId(event)"></TextBox>
-                <TextBox class="text_box" placeholder="パスワード" type="password" @on-input="event =>textInputCommands.inputPassword(event)"></TextBox>
+                <TextBox class="text_box" placeholder="表示される名前"
+                    @on-input="event => textInputCommands.inputScreenName(event)"></TextBox>
+                <TextBox class="text_box" placeholder="ID" @on-input="event => textInputCommands.inputSignInId(event)">
+                </TextBox>
+                <TextBox class="text_box" placeholder="パスワード" type="password"
+                    @on-input="event => textInputCommands.inputPassword(event)"></TextBox>
             </div>
             <div class="dialog_buttons">
                 <FrogNoteButton text="やめる" @click="dialogCommands.toggleIsSignUpDialogOpened()"></FrogNoteButton>
@@ -274,5 +293,4 @@ function upload(): void {
 .v-leave-to {
     opacity: 0;
     z-index: 2147483647;
-}
-</style>
+}</style>
